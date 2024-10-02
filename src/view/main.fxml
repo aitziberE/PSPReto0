@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.MainController">
+    <top>
+        <TextField fx:id="searchField" promptText="Buscar por PID..." />
+    </top>
+    <center>
+        <ListView fx:id="processListView" />
+    </center>
+    <bottom>
+        <Button fx:id="increasePriorityButton" text="Aumentar Prioridad" onAction="#increasePriority" />
+    </bottom>
+</BorderPane>
