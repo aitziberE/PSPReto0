@@ -39,7 +39,7 @@ public class ProcessManager {
             Process process = builder.start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
-            reader.readLine(); // Ignorar cabeceras
+            reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 String name = parts[0].replace("\"", "");
@@ -62,7 +62,7 @@ public class ProcessManager {
         ProcessInfo selectedProcess = processListView.getSelectionModel().getSelectedItem();
         if (selectedProcess != null) {
             try {
-                String command = String.format("wmic process where ProcessId=%d call setpriority 128", selectedProcess.getPid());
+                String command = String.format("wmic process where ProcessId=%d call setpriority 13", selectedProcess.getPid());
                 Runtime.getRuntime().exec(command);
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Prioridad aumentada para el proceso: " + selectedProcess.getName());
                 alert.showAndWait();
