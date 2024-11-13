@@ -23,8 +23,6 @@ public class MainController {
     private ListView<ProcessInfo> processListView;
     @FXML
     private TextField searchField;
-    @FXML
-    private Button increasePriorityButton;
 
     private ProcessManager processManager;
 
@@ -39,5 +37,10 @@ public class MainController {
     @FXML
     public void increasePriority(ActionEvent event) {
         processManager.increasePriority();
+    }
+    
+    @FXML
+    public void killProcess(ActionEvent event) {
+        processManager.killProcess();
     }
 }

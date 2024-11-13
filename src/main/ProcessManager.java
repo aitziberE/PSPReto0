@@ -14,6 +14,8 @@ import javafx.scene.control.TextField;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Optional;
+import javafx.scene.control.ButtonType;
 
 /**
  *
@@ -68,6 +70,38 @@ public class ProcessManager {
                 alert.showAndWait();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Por favor, selecciona un proceso.");
+            alert.showAndWait();
+        }
+    }
+    
+   public void killProcess() {
+        ProcessInfo selectedProcess = processListView.getSelectionModel().getSelectedItem();
+        if (selectedProcess != null) {
+            Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmationAlert.setTitle("Detener proceso");
+            confirmationAlert.setHeaderText("¿Estás seguro de que deseas detener este proceso?");
+            confirmationAlert.setContentText("Proceso: " + selectedProcess.getName() + "\nPID: " + selectedProcess.getPid());
+
+            Optional<ButtonType> result = confirmationAlert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                try {
+                    String command = String.format("taskkill /F /PID %d", selectedProcess.getPid());
+                    Process process = Runtime.getRuntime().exec(command);
+                    process.waitFor();
+
+                    // Elimina el proceso de la lista
+                    processList.remove(selectedProcess);
+
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Proceso detenido: " + selectedProcess.getName());
+                    alert.showAndWait();
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Error al detener el proceso.");
+                    alert.showAndWait();
+                }
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING, "Por favor, selecciona un proceso.");

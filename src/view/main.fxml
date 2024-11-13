@@ -12,6 +12,9 @@
         <ListView fx:id="processListView" />
     </center>
     <bottom>
-        <Button fx:id="increasePriorityButton" text="Aumentar Prioridad" onAction="#increasePriority" />
+        <HBox alignment="CENTER" spacing="10">
+            <Button fx:id="increasePriorityButton" text="Aumentar Prioridad" onAction="#increasePriority" />
+            <Button fx:id="killProcessButton" text="Detener Proceso" onAction="#killProcess" />
+        </HBox>
     </bottom>
 </BorderPane>
