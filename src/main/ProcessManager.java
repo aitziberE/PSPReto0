@@ -14,6 +14,8 @@ import javafx.scene.control.TextField;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javafx.scene.control.ButtonType;
 
@@ -26,6 +28,7 @@ public class ProcessManager {
     private ListView<ProcessInfo> processListView;
     private ObservableList<ProcessInfo> processList;
     private TextField searchField;
+    private List<Integer> pausedProcesses = new ArrayList<>();
 
     public ProcessManager(ListView<ProcessInfo> processListView, TextField searchField) {
         this.processListView = processListView;
@@ -53,11 +56,11 @@ public class ProcessManager {
         }
     }
 
-    public void filterProcesses() {
+     public void filterProcesses() {
         String filter = searchField.getText().toLowerCase();
-        processListView.setItems(processList.filtered(process -> {
-            return String.valueOf(process.getPid()).contains(filter);
-        }));
+        processListView.setItems(processList.filtered(process ->
+            process.getName().toLowerCase().contains(filter) || String.valueOf(process.getPid()).contains(filter)
+        ));
     }
 
     public void increasePriority() {
@@ -100,6 +103,47 @@ public class ProcessManager {
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                     Alert alert = new Alert(Alert.AlertType.ERROR, "Error al detener el proceso.");
+                    alert.showAndWait();
+                }
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Por favor, selecciona un proceso.");
+            alert.showAndWait();
+        }
+    }
+   
+     public void pauseResumeProcess() {
+        ProcessInfo selectedProcess = processListView.getSelectionModel().getSelectedItem();
+        if (selectedProcess != null) {
+            int pid = selectedProcess.getPid();
+            boolean isPaused = pausedProcesses.contains(pid);
+            String action = isPaused ? "reanudar" : "pausar";
+            String command = String.format("pssuspend %s %d", isPaused ? "-r" : "", pid);
+
+
+            Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmationAlert.setTitle(action.substring(0, 1).toUpperCase() + action.substring(1) + " proceso");
+            confirmationAlert.setHeaderText("¿Estás seguro de que deseas " + action + " este proceso?");
+            confirmationAlert.setContentText("Proceso: " + selectedProcess.getName() + "\nPID: " + pid);
+
+            Optional<ButtonType> result = confirmationAlert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                try {
+                    Process process = Runtime.getRuntime().exec(command);
+                    process.waitFor();
+
+                    if (isPaused) {
+                        pausedProcesses.remove(Integer.valueOf(pid));
+                    } else {
+                        pausedProcesses.add(pid);
+                    }
+
+                    String message = "Proceso " + (isPaused ? "reanudado: " : "pausado: ") + selectedProcess.getName();
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, message);
+                    alert.showAndWait();
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Error al " + action + " el proceso.");
                     alert.showAndWait();
                 }
             }

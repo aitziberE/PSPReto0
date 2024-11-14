@@ -43,4 +43,9 @@ public class MainController {
     public void killProcess(ActionEvent event) {
         processManager.killProcess();
     }
+    
+    @FXML
+    public void pauseResumeProcess(ActionEvent event) {
+        processManager.pauseResumeProcess();
+    }
 }
